@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-# stub: search_ui 0.0.0 ruby lib
+# stub: search_ui 0.0.1 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "search_ui".freeze
-  s.version = "0.0.0"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Florian Frank".freeze]
-  s.date = "2020-02-11"
+  s.date = "2020-02-14"
   s.description = "This library allows a user to search an array of objects\n  interactively in the console by matching the pattern a user inputs to an\n  array of objects and pick one of the remaining objects.".freeze
   s.email = "flori@ping.de".freeze
   s.executables = ["search_it".freeze]

@@ -26,10 +26,9 @@ class SearchUI::Search
     @matches = @match.(@answer)
     @selector = [ 0, [ @selector, @matches.size - 1 ].min ].max
     result = @query.(@answer, @matches, @selector)
-    @output.print clear_screen
-    @output.print move_home { ?\n + result }
     loop do
-      @output.print move_home { @prompt % @answer }
+      @output.print clear_screen
+      @output.print move_home { @prompt % @answer + ?\n + result }
       case getc
       when true
         @output.print clear_screen, move_home, reset
@@ -44,8 +43,6 @@ class SearchUI::Search
       @matches = @match.(@answer)
       @selector = [ 0, [ @selector, @matches.size - 1 ].min ].max
       result = @query.(@answer, @matches, @selector)
-      @output.print clear_screen
-      @output.print move_home { ?\n + result }
     end
   end
 
