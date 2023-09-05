@@ -20,9 +20,10 @@ GemHadar do
   executables << 'search_it'
 
   required_ruby_version '>= 2.0'
-  dependency  'tins', '~>1.0'
-  dependency 'term-ansicolor', '~>1.0'
-  dependency 'amatch', '~>0.0'
+  dependency             'tins', '~>1.0'
+  dependency             'term-ansicolor', '~>1.0'
+  dependency             'amatch', '~>0.0'
   development_dependency 'simplecov', '~>0.0'
+  development_dependency 'debugger'
   licenses << 'MIT'
 end
