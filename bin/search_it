@@ -2,12 +2,21 @@
 
 require 'search_ui'
 require 'tins/terminal'
+require 'tins/go'
+include Tins::GO
 require 'amatch'
 include SearchUI
 
+opts = go('f:')
 
-choices = ARGV
-exit if choices.empty?
+choices =
+  if filename = opts[?f]
+    File.readlines(filename).map(&:chomp)
+  elsif ARGV.empty?
+    exit
+  else
+    ARGV
+  end
 
 found = Search.new(
   match: -> answer {
