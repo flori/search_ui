@@ -6,7 +6,7 @@ GemHadar do
   name        'search_ui'
   author      'Florian Frank'
   email       'flori@ping.de'
-  homepage    "http://flori.github.com/#{name}"
+  homepage    "https://github.com/flori/#{name}"
   summary     'Library to provide a user interface for searching in a console'
   description 'This library allows a user to search an array of objects
   interactively in the console by matching the pattern a user inputs to an
@@ -24,6 +24,6 @@ GemHadar do
   dependency             'term-ansicolor', '~>1.0'
   dependency             'amatch', '~>0.0'
   development_dependency 'simplecov', '~>0.0'
-  development_dependency 'debugger'
+  development_dependency 'debug'
   licenses << 'MIT'
 end

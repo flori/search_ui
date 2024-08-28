@@ -49,6 +49,7 @@ class SearchUI::Search
   private
 
   def getc
+    print hide_cursor
     system 'stty raw -echo'
     c = STDIN.getc
     system 'stty cooked echo'
@@ -82,6 +83,8 @@ class SearchUI::Search
       @answer << c
       nil
     end
+  ensure
+    print show_cursor
   end
 end
 
