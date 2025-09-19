@@ -8,7 +8,7 @@ array of objects and pick one of the remaining objects.
 
 ## Download
 
-The homepage of this library is located at http://github.com/flori/search\_ui
+The homepage of this library is located at http://github.com/flori/search_ui
 
 ## Author
 
