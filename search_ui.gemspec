@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Florian Frank".freeze]
-  s.date = "2024-08-28"
+  s.date = "1980-01-02"
   s.description = "This library allows a user to search an array of objects\n  interactively in the console by matching the pattern a user inputs to an\n  array of objects and pick one of the remaining objects.".freeze
   s.email = "flori@ping.de".freeze
   s.executables = ["search_it".freeze]
@@ -18,12 +18,12 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT".freeze]
   s.rdoc_options = ["--title".freeze, "SearchUi -- Search User Interface".freeze, "--main".freeze, "README.md".freeze]
   s.required_ruby_version = Gem::Requirement.new(">= 2.0".freeze)
-  s.rubygems_version = "3.5.16".freeze
+  s.rubygems_version = "3.6.9".freeze
   s.summary = "Library to provide a user interface for searching in a console".freeze
 
   s.specification_version = 4
 
-  s.add_development_dependency(%q<gem_hadar>.freeze, ["~> 1.17.0".freeze])
+  s.add_development_dependency(%q<gem_hadar>.freeze, ["~> 2.6".freeze])
   s.add_development_dependency(%q<simplecov>.freeze, ["~> 0.0".freeze])
   s.add_development_dependency(%q<debug>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<tins>.freeze, ["~> 1.0".freeze])
