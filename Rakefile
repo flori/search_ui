@@ -15,6 +15,7 @@ GemHadar do
 
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', 'coverage', '.AppleDouble',
     'tags', '.DS_Store', '.yardoc', 'doc'
+    package_ignore '.github', '.gitignore'
   readme      'README.md'
   title       "#{path_module} -- Search User Interface"
 
