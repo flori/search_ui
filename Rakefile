@@ -4,6 +4,7 @@ require 'gem_hadar'
 
 GemHadar do
   name        'search_ui'
+  path_module 'SearchUI'
   author      'Florian Frank'
   email       'flori@ping.de'
   homepage    "https://github.com/flori/#{name}"
@@ -12,10 +13,10 @@ GemHadar do
   interactively in the console by matching the pattern a user inputs to an
   array of objects and pick one of the remaining objects.'
 
-  ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', 'coverage', '.rvmrc',
-    '.AppleDouble', 'tags', '.byebug_history', '.DS_Store'
+  ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', 'coverage', '.AppleDouble',
+    'tags', '.DS_Store', '.yardoc', 'doc'
   readme      'README.md'
-  title       "#{name.camelize} -- Search User Interface"
+  title       "#{path_module} -- Search User Interface"
 
   executables << 'search_it'
 
