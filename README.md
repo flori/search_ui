@@ -4,6 +4,10 @@
 
 A Ruby library for creating interactive console-based search interfaces 🎯
 
+## Documentation
+
+Complete API documentation is available at: [GitHub.io](https://flori.github.io/search_ui/)
+
 ## Features
 
 - **Interactive Navigation** 🎮: Arrow key navigation through search results
