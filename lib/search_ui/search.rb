@@ -55,7 +55,7 @@ class SearchUI::Search
   def start
     @output.print reset
     @matches = @match.(@answer)
-    @selector = [ 0, [ @selector, @matches.size - 1 ].min ].max
+    @selector = @selector.clamp(0, [ @matches.size - 1, 0 ].max)
     result = @query.(@answer, @matches, @selector)
     loop do
       @output.print clear_screen
@@ -72,7 +72,7 @@ class SearchUI::Search
         return nil
       end
       @matches = @match.(@answer)
-      @selector = @selector.clamp(0, @matches.size - 1)
+      @selector = @selector.clamp(0, [ @matches.size - 1, 0 ].max)
       result = @query.(@answer, @matches, @selector)
     end
   end
