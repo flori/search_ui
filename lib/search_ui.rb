@@ -1,4 +1,3 @@
-
 # SearchUI is a library that provides interactive console-based searching
 # capabilities
 #
@@ -14,4 +13,5 @@ module SearchUI
 end
 
 require 'search_ui/version'
+require 'search_ui/wrapper'
 require 'search_ui/search'
