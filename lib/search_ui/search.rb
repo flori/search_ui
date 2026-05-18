@@ -43,7 +43,6 @@ class SearchUI::Search
     @output       = output
     @prompt       = prompt
     @selector     = 0
-    @max_selector = nil
     @answer       = ''
   end
 
