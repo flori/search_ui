@@ -18,13 +18,13 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT".freeze]
   s.rdoc_options = ["--title".freeze, "SearchUI -- Search User Interface".freeze, "--main".freeze, "README.md".freeze]
   s.required_ruby_version = Gem::Requirement.new(">= 2.0".freeze)
-  s.rubygems_version = "4.0.3".freeze
+  s.rubygems_version = "4.0.10".freeze
   s.summary = "Library to provide a user interface for searching in a console".freeze
   s.test_files = ["spec/search_ui/wrapper_spec.rb".freeze, "spec/spec_helper.rb".freeze]
 
   s.specification_version = 4
 
-  s.add_development_dependency(%q<gem_hadar>.freeze, [">= 2.17.0".freeze])
+  s.add_development_dependency(%q<gem_hadar>.freeze, [">= 2.17.1".freeze])
   s.add_development_dependency(%q<rspec>.freeze, ["~> 3.0".freeze])
   s.add_development_dependency(%q<simplecov>.freeze, ["~> 0.0".freeze])
   s.add_development_dependency(%q<debug>.freeze, [">= 0".freeze])
