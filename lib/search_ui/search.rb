@@ -25,7 +25,7 @@ class SearchUI::Search
   # @param query [ Proc ] a procedure that takes the current answer, matches,
   #   and selector index to generate a query result
   # @param found [ Proc ] a procedure that takes the current answer, matches,
-  #   jand selector index to determine if a selection has been made
+  #   and selector index to determine if a selection has been made
   # @param output [ IO ] the output stream to display the search interface
   #   (defaults to STDOUT)
   # @param prompt [ String ] the prompt template to display during searching
