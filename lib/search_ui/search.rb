@@ -98,18 +98,25 @@ class SearchUI::Search
 
   private
 
-  # Reads and processes a single character input from stdin, handling special
+  # Reads and processes a single character input from STDIN, handling special
   # key sequences and updating the search state accordingly.
   #
   # This method manages raw terminal input to capture user keystrokes,
-  # interpreting control characters and escape sequences for navigation,
-  # selection, and editing operations. It temporarily disables terminal echo
-  # and sets raw mode to ensure proper input handling.
+  # interpreting control characters and ANSI escape sequences:
+  # - Up/Down arrows: Navigate the result selector.
+  # - Enter (`\r`): Confirms the current selection.
+  # - Ctrl-C (`\x03`): Cancels the search operation.
+  # - Ctrl-K (`\v`): Clears the current search answer.
+  # - Backspace (`\x7f`): Deletes the last character of the answer.
+  # - Note: Any modification to the search answer resets the selector to 0.
   #
-  # @return [ Boolean, nil ] returns true when the Enter key is pressed to
-  #   confirm selection, false when Ctrl+C is pressed to cancel the operation, or
-  #   nil for all other inputs
-  #   which update the search state and require further processing
+  # It temporarily disables terminal echo and sets raw mode to ensure proper
+  # input handling.
+  #
+  # @return [ Boolean, nil ]
+  #   - `true`: The Enter key was pressed to confirm selection.
+  #   - `false`: Ctrl-C was pressed to cancel the operation.
+  #   - `nil`: Input updated the search state or was ignored.
   def getc
     print hide_cursor
     system 'stty raw -echo'
@@ -134,7 +141,7 @@ class SearchUI::Search
       @state.selector = 0
       @state.answer.chop!
       nil
-    when "\v"
+    when ?\v
       @state.selector = 0
       @state.answer.clear
       nil
