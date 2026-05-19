@@ -18,33 +18,53 @@ class SearchUI::Search
   include Term::ANSIColor
   extend Term::ANSIColor
 
-  # Initializes a new SearchUI::Search instance with the specified parameters.
+  # Represents the current state of the search interface.
   #
-  # @param match [ Proc ] a procedure that takes a string and returns an array
-  #   of matching objects
-  # @param query [ Proc ] a procedure that takes the current answer, matches,
-  #   and selector index to generate a query result
-  # @param found [ Proc ] a procedure that takes the current answer, matches,
-  #   and selector index to determine if a selection has been made
-  # @param output [ IO ] the output stream to display the search interface
-  #   (defaults to STDOUT)
-  # @param prompt [ String ] the prompt template to display during searching
-  #   (defaults to 'Search? %s')
+  # @attr answer [ String ] the current input string entered by the user
+  # @attr selector [ Integer ] the index of the currently selected match
+  State = Struct.new(:answer, :selector)
+
+  # Initializes a new SearchUI::Search instance to manage an interactive
+  # console search interface. This method sets up the filtering logic, display
+  # formatting, and selection criteria required to drive the search loop, as
+  # well as the output stream and prompt.
+  #
+  # @param match [ Proc ] a procedure that accepts a search pattern string and returns
+  #   an array of matching objects.
+  # @param query [ Proc ] a procedure that accepts the current answer, the list of
+  #   matches, and the current selector index to generate the string representation
+  #   of the results list.
+  # @param found [ Proc ] a procedure that accepts the current answer, the list of
+  #   matches, and the current selector index to determine the final selected object.
+  # @param output [ IO ] the output stream where the interface will be rendered.
+  #   Defaults to STDOUT.
+  # @param prompt [ String ] a format string used as the user prompt.
+  #   Defaults to 'Search? %s'.
+  # @param state [ SearchUI::Search::State, nil ] an initial state object containing
+  #   the starting answer and selector position. Defaults to a new State with an
+  #   empty answer and selector set to 0.
   def initialize(
     match:,
     query:,
     found:,
     output: STDOUT,
-    prompt: 'Search? %s'
+    prompt: 'Search? %s',
+    state:  nil
   )
     @match        = match
     @query        = query
     @found        = found
     @output       = output
     @prompt       = prompt
-    @selector     = 0
-    @answer       = ''
+    @state        = state || State.new('', 0)
   end
+
+  # Reads the current internal state of the search interface, containing the
+  # current input answer and the active selection index.
+  #
+  # @return [ SearchUI::Search::State ] the current state object tracking
+  #   the user's search progress and cursor position
+  attr_reader :state
 
   # Starts the interactive search interface and handles user input until a
   # selection is made or the process is cancelled.
@@ -53,16 +73,16 @@ class SearchUI::Search
   #   is made, or nil if the process is cancelled
   def start
     @output.print reset
-    @matches = @match.(@answer)
-    @selector = @selector.clamp(0, [ @matches.size - 1, 0 ].max)
-    result = @query.(@answer, @matches, @selector)
+    @matches = @match.(@state.answer)
+    @state.selector = @state.selector.clamp(0, [ @matches.size - 1, 0 ].max)
+    result = @query.(@state.answer, @matches, @state.selector)
     loop do
       @output.print clear_screen
-      @output.print move_home { @prompt % @answer + ?\n + result }
+      @output.print move_home { @prompt % @state.answer + ?\n + result }
       case getc
       when true
         @output.print clear_screen, move_home, reset
-        if result = @found.(@answer, @matches, @selector)
+        if result = @found.(@state.answer, @matches, @state.selector)
           return result
         else
           return nil
@@ -70,9 +90,9 @@ class SearchUI::Search
       when false
         return nil
       end
-      @matches = @match.(@answer)
-      @selector = @selector.clamp(0, [ @matches.size - 1, 0 ].max)
-      result = @query.(@answer, @matches, @selector)
+      @matches = @match.(@state.answer)
+      @state.selector = @state.selector.clamp(0, [ @matches.size - 1, 0 ].max)
+      result = @query.(@state.answer, @matches, @state.selector)
     end
   end
 
@@ -102,27 +122,27 @@ class SearchUI::Search
       STDIN.getc == ?[ or return nil
       STDIN.getc =~ /\A([AB])\z/ or return nil
       if $1 == ?A
-        @selector -= 1
+        @state.selector -= 1
       else
-        @selector += 1
+        @state.selector += 1
       end
-      @selector = [ @selector, 0 ].max
+      @state.selector = [ @state.selector, 0 ].max
       nil
     when ?\r
       true
     when "\x7f"
-      @selector = 0
-      @answer.chop!
+      @state.selector = 0
+      @state.answer.chop!
       nil
     when "\v"
-      @selector = 0
-      @answer.clear
+      @state.selector = 0
+      @state.answer.clear
       nil
     when /\A[\x00-\x1f]\z/
       nil
     else
-      @selector = 0
-      @answer << c
+      @state.selector = 0
+      @state.answer << c
       nil
     end
   ensure
