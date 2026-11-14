@@ -97,8 +97,9 @@ result = SearchUI::Search.new(
     end.join("\n")
   },
   found: ->(answer, matches, selector) { matches[selector] },
-  multi: true,
-  prompt: 'Pick fruit? %s [^Space=toggle, Enter=done, ^C=abort]'
+  multi:   true,
+  picked:  ['bananas'],
+  prompt:  'Pick fruit? %s [^Space=toggle, Enter=done, ^C=abort]'
 ).start
 
 puts "Picked: #{result.inspect}"

@@ -49,6 +49,11 @@ class SearchUI::Search
   # @param state [ SearchUI::Search::State, nil ] an initial state object containing
   #   the starting answer and selector position. Defaults to a new State with an
   #   empty answer and selector set to 0.
+  # @param picked [ Hash, Array, Set, nil ] initial multi-select picks. A Hash
+  #   is merged directly; an Array or Set is converted to `{ item => true }`.
+  #   Only meaningful when `multi: true`. Defaults to nil (no pre-picks).
+  # @raise [ ArgumentError ] if `picked` is not `nil` and does not respond
+  #   to `#to_hash`, `#to_ary`, or `#to_set`.
   def initialize(
     match:,
     query:,
@@ -56,7 +61,8 @@ class SearchUI::Search
     multi:  false,
     output: STDOUT,
     prompt: 'Search? %s',
-    state:  nil
+    state:  nil,
+    picked: nil
   )
     @match        = match
     @query        = query
@@ -66,6 +72,17 @@ class SearchUI::Search
     @multi        = multi
     @state        = state || State.new('', 0)
     @picked       = Hash.new(false)
+    case
+    when picked.nil?
+    when picked.respond_to?(:to_hash)
+      @picked.update(picked.to_hash)
+    when picked.respond_to?(:to_ary)
+      @picked.update(picked.to_ary.each_with_object({}) { |k, h| h[k] = true })
+    when picked.respond_to?(:to_set)
+      @picked.update(picked.to_set.each_with_object({}) { |k, h| h[k] = true })
+    else
+      raise ArgumentError, 'picked needs to support #to_hash | #to_ary | #to_set'
+    end
   end
 
   # Reads the current internal state of the search interface, containing the
