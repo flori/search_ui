@@ -12,6 +12,7 @@ Complete API documentation is available at: [GitHub.io](https://flori.github.io/
 
 - **Interactive Navigation** 🎮: Arrow key navigation through search results
 - **Real-time Filtering** ⚡: Instant search updates as you type
+- **Multi-Select** 📋: Ctrl-Space toggles items, Enter returns all picked
 - **Flexible Configuration** 🔧: Customizable matching, display, and selection logic
 - **Terminal-aware** 🖥️: Properly handles terminal input and display management
 - **Minimal Dependencies** 📦: Lightweight implementation using standard Ruby libraries
@@ -62,6 +63,45 @@ result = SearchUI::Search.new(
 ).start
 
 puts "Selected: #{result}"
+```
+
+#### Multi-Select
+
+Pass `multi: true` to collect multiple items before returning. The `query`
+proc additionally receives a fourth argument — a `picked` Hash — so you can
+render a visual marker (e.g. `✔`) on already-selected entries.
+
+**Keys:**
+
+| Key         | Action                                          |
+|-------------|-------------------------------------------------|
+| Arrow Up/Dn | Navigate the list                               |
+| Ctrl-Space  | Toggle selection of the current entry           |
+| Enter       | Confirm and return all picked items as an Array |
+| Ctrl-C      | Abort and return `nil`                          |
+
+```ruby
+require 'search_ui'
+
+result = SearchUI::Search.new(
+  match: ->(pattern) {
+    %w[apples bananas cherries dates figs grapes].select do |f|
+      pattern.empty? || f.include?(pattern)
+    end
+  },
+  query: ->(answer, matches, selector, picked) {
+    matches.each_with_index.map do |m, i|
+      cursor = i == selector ? '→' : ' '
+      mark   = picked[m] ? '✔' : ' '
+      "#{cursor} #{mark} #{m}"
+    end.join("\n")
+  },
+  found: ->(answer, matches, selector) { matches[selector] },
+  multi: true,
+  prompt: 'Pick fruit? %s [^Space=toggle, Enter=done, ^C=abort]'
+).start
+
+puts "Picked: #{result.inspect}"
 ```
 
 ### Command Line Tool
