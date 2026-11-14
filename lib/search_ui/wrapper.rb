@@ -51,7 +51,7 @@ class SearchUI::Wrapper < BasicObject
   # @return [String]
   def to_s
     if @display.respond_to?(:call)
-      case @display.method(:call).arity
+      case @display.arity
       when 0
         @display.()
       else

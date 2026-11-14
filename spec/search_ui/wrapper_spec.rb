@@ -19,6 +19,28 @@ describe SearchUI::Wrapper do
     wrapper = described_class.new(value)
     expect(wrapper.to_s).to eq 'foo'
   end
+  context 'with a Proc display' do
+    it 'calls with no args when arity is 0' do
+      wrapper = described_class.new(value, display: -> { '🟢 custom' })
+      expect(wrapper.to_s).to eq '🟢 custom'
+    end
+
+    it 'calls with the value when arity is positive' do
+      wrapper = described_class.new(
+        value,
+        display: ->(v) { "🔵 #{v.upcase}" }
+      )
+      expect(wrapper.to_s).to eq '🔵 FOO'
+    end
+
+    it 'calls with the value when arity is negative (splat)' do
+      wrapper = described_class.new(
+        value,
+        display: ->(*args) { "🟡 #{args.first}" }
+      )
+      expect(wrapper.to_s).to eq '🟡 foo'
+    end
+  end
 
   it 'delegates methods to the wrapped value (e.g., length)' do
     expect(sw1.length).to eq 3
