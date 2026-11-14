@@ -1,4 +1,5 @@
 require 'term/ansicolor'
+require 'io/console'
 
 # SearchUI::Search manages interactive console-based searching through an array
 # of objects
@@ -135,70 +136,70 @@ class SearchUI::Search
   # Reads and processes a single character input from STDIN, handling special
   # key sequences and updating the search state accordingly.
   #
-  # This method manages raw terminal input to capture user keystrokes,
-  # interpreting control characters and ANSI escape sequences:
+  # This method uses `STDIN.raw` (io/console) to capture user keystrokes in
+  # raw mode with interrupt handling, interpreting control characters and
+  # ANSI escape sequences:
   # - Up/Down arrows: Navigate the result selector.
   # - Enter (`\r`): Confirms the current selection.
   # - Ctrl-Space (`\x00`): In multi mode, toggles selection of the current
   #   match. In single mode, ignored.
-  # - Ctrl-C (`\x03`): Cancels the search operation.
+  # - Ctrl-C: Raises Interrupt, caught to cancel the search operation.
   # - Ctrl-K (`\v`): Clears the current search answer.
   # - Backspace (`\x7f`): Deletes the last character of the answer.
   # - Note: Any modification to the search answer resets the selector to 0.
-  #
-  # It temporarily disables terminal echo and sets raw mode to ensure proper
-  # input handling.
   #
   # @return [ Boolean, nil ]
   #   - `true`: The Enter key was pressed to confirm selection.
   #   - `false`: Ctrl-C was pressed to cancel the operation.
   #   - `nil`: Input updated the search state or was ignored.
   def getc
+    interrupted = [ Interrupt, Errno::ENOTTY ]
+    interrupted << IRB::Abort if defined? IRB::Abort
     print hide_cursor
-    system 'stty raw -echo'
-    c = STDIN.getc
-    system 'stty cooked echo'
-    case c
-    when "\x03"
-      false
-    when "\e"
-      STDIN.getc == ?[ or return nil
-      STDIN.getc =~ /\A([AB])\z/ or return nil
-      if $1 == ?A
-        @state.selector -= 1
-      else
-        @state.selector += 1
-      end
-      @state.selector = [ @state.selector, 0 ].max
-      nil
-    when ?\r
-      true
-    when "\x7f"
-      @state.selector = 0
-      @state.answer.chop!
-      nil
-    when ?\v
-      @state.selector = 0
-      @state.answer.clear
-      nil
-    when "\x00"
-      if @multi
-        if m = @matches[@state.selector]
-          if @picked.key?(m)
-            @picked.delete(m)
-          else
-            @picked[m] = true
+    STDIN.raw(min: 1, intr: true) do |io|
+      c = io.getc
+      case c
+      when "\e"
+        io.getc == ?[ or return nil
+        io.getc =~ /\A([AB])\z/ or return nil
+        if $1 == ?A
+          @state.selector -= 1
+        else
+          @state.selector += 1
+        end
+        @state.selector = [ @state.selector, 0 ].max
+        nil
+      when ?\r
+        true
+      when "\x7f"
+        @state.selector = 0
+        @state.answer.chop!
+        nil
+      when ?\v
+        @state.selector = 0
+        @state.answer.clear
+        nil
+      when "\x00"
+        if @multi
+          if m = @matches[@state.selector]
+            if @picked.key?(m)
+              @picked.delete(m)
+            else
+              @picked[m] = true
+            end
           end
         end
+        nil
+      when /\A[\x01-\x1f]\z/
+        nil
+      else
+        @state.selector = 0
+        @state.answer << c
+        nil
       end
-      nil
-    when /\A[\x01-\x1f]\z/
-      nil
-    else
-      @state.selector = 0
-      @state.answer << c
-      nil
     end
+  rescue *interrupted
+    false
   ensure
     print show_cursor
   end
