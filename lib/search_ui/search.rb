@@ -66,6 +66,8 @@ class SearchUI::Search
     output: STDOUT,
     prompt: 'Search? %s',
     state:  nil,
+    all:    nil,
+    none:   nil,
     picked: nil
   )
     @match        = match
@@ -77,6 +79,8 @@ class SearchUI::Search
     @prompt       = prompt
     @multi        = multi
     @state        = state || State.new('', 0)
+    @all          = all
+    @none         = none
     @picked       = Hash.new(false)
     case
     when picked.nil?
@@ -106,6 +110,9 @@ class SearchUI::Search
   #   items or nil if cancelled.
   def start
     @output.print reset
+    @matchables  = @match.('').dup
+    @matchables.delete(@all) unless @all.nil?
+    @matchables.delete(@none) unless @none.nil?
     result = refresh
     loop do
       @output.print clear_screen
@@ -114,7 +121,7 @@ class SearchUI::Search
       when true
         @output.print clear_screen, move_home, reset
         if @multi
-          return @picked.keys
+          return @picked.select { _2 }.keys
         else
           if result = @found.(@state.answer, @matches, @state.selector)
             return result
@@ -249,8 +256,13 @@ class SearchUI::Search
       when "\x00"
         if @multi
           if m = @matches[@state.selector]
-            if @picked.key?(m)
-              @picked.delete(m)
+            case
+            when !@all.nil? && @all == m
+              @matchables.each { @picked[_1] = true }
+            when !@none.nil? && @none == m
+              @picked.clear
+            when @picked[m]
+              @picked[m] = false
             else
               @picked[m] = true
             end
