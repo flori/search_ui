@@ -17,7 +17,8 @@ class SearchUI::Wrapper < BasicObject
   # Initializes a new wrapper.
   #
   # @param value [Object] The object you want to wrap.
-  # @option options [String, Proc] :display Custom display string or block that returns it.
+  # @param display [String, Proc] Custom display string or a callable
+  #   receiving the wrapped value (or no args) and returning a display string.
   #   Defaults to `value.to_s`.
   def initialize(value, display: value.to_s)
     @value   = value
@@ -43,12 +44,22 @@ class SearchUI::Wrapper < BasicObject
 
   # String representation of the wrapped object.
   #
-  # If a custom `display` was supplied, that string is returned; otherwise,
-  # it falls back to `value.to_s`.
+  # If `display` is a String, it is returned as-is. If it is a callable,
+  # it is invoked (passing the wrapped value when arity ≥ 1) and its
+  # return value is used. Otherwise falls back to `value.to_s`.
   #
   # @return [String]
   def to_s
-    @display.to_s
+    if @display.respond_to?(:call)
+      case @display.method(:call).arity
+      when 0
+        @display.()
+      else
+        @display.(@value)
+      end
+    else
+      @display
+    end.to_s
   end
 
   alias to_str to_s
