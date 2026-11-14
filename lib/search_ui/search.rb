@@ -170,7 +170,9 @@ class SearchUI::Search
   # This method uses `STDIN.raw` (io/console) to capture user keystrokes in
   # raw mode with interrupt handling, interpreting control characters and
   # ANSI escape sequences:
-  # - Up/Down arrows: Navigate the result selector.
+  # - Up/Down arrows: Navigate the result selector by one row.
+  # - Home (\e[H, \e[1~, \eOH) / End (\e[F, \e[4~, \eOF): Jump to first / last.
+  # - PgUp (\e[5~) / PgDn (\e[6~): Jump by one viewport height.
   # - Enter (`\r`): Confirms the current selection.
   # - Ctrl-Space (`\x00`): In multi mode, toggles selection of the current
   #   match. In single mode, ignored.
@@ -191,12 +193,46 @@ class SearchUI::Search
       c = io.getc
       case c
       when "\e"
-        io.getc == ?[ or return nil
-        io.getc =~ /\A([AB])\z/ or return nil
-        if $1 == ?A
-          @state.selector -= 1
+        prefix = io.getc
+        case prefix
+        when ?[
+          key = io.getc
+          case key
+          when ?A
+            @state.selector -= 1
+          when ?B
+            @state.selector += 1
+          when ?H
+            @state.selector = 0
+          when ?F
+            @state.selector = [ @matches.size - 1, 0 ].max
+          when ?1, ?4, ?5, ?6
+            io.getc == ?~ or return nil
+            case key
+            when ?1
+              @state.selector = 0
+            when ?4
+              @state.selector = [ @matches.size - 1, 0 ].max
+            when ?5
+              @state.selector -= @height
+            when ?6
+              @state.selector += @height
+            end
+          else
+            return nil
+          end
+        when ?O
+          key = io.getc
+          case key
+          when ?H
+            @state.selector = 0
+          when ?F
+            @state.selector = [ @matches.size - 1, 0 ].max
+          else
+            return nil
+          end
         else
-          @state.selector += 1
+          return nil
         end
         @state.selector = [ @state.selector, 0 ].max
         nil
