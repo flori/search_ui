@@ -1,4 +1,18 @@
 #!/usr/bin/env ruby
+#
+# Interactive console search for picking items from a list.
+#
+# Usage:
+#   search_it [ITEM …]     Search through command-line arguments
+#   search_it -f FILE      Search through lines of a file
+#   search_it -m …         Multi-select mode (Ctrl-Space to toggle, Enter to confirm)
+#
+# Keys:
+#   ↑/↓      Navigate results
+#   Enter    Confirm selection
+#   Ctrl-C   Abort (returns nothing)
+#   Ctrl-K   Clear search input
+#   Ctrl-Space  Toggle item (multi mode only)
 
 require 'search_ui'
 require 'tins/terminal'
@@ -7,7 +21,7 @@ include Tins::GO
 require 'amatch'
 include SearchUI
 
-opts = go('f:')
+opts = go('mf:')
 
 choices =
   if filename = opts[?f]
@@ -18,6 +32,21 @@ choices =
     ARGV
   end
 
+if multi = !!opts[?m]
+  query = -> _answer, matches, selector, picked {
+    matches.each_with_index.map { |m, i|
+      mark   = picked[m] ? '✓' : '☐'
+      cursor = i == selector ? "→ " : "  "
+      "#{cursor}#{mark} #{m}"
+    } * ?\n
+  }
+else
+  query = -> _answer, matches, selector {
+    matches.each_with_index.
+    map { |m, i| i == selector ? "→ " + Search.on_blue(m) : "  " + m } * ?\n
+  }
+end
+
 found = Search.new(
   match:  -> answer {
     matcher = Amatch::PairDistance.new(answer.downcase)
@@ -26,10 +55,8 @@ found = Search.new(
     matches.empty? and matches = choices
     matches
   },
-  query:  -> _answer, matches, selector {
-    matches.each_with_index.
-    map { |m, i| i == selector ? "→ " + Search.on_blue(m) : "  " + m } * ?\n
-  },
+  query:,
+  multi:,
   found:  -> _answer, matches, selector {
     matches[selector]
   },
