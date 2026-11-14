@@ -42,7 +42,7 @@ class SearchUI::Search
   #   final selected object.
   # @param height [ Integer ] the number of rows to display. Defaults to
   #   `Tins::Terminal.lines - 1` (clamped to >= 0).
-  # @param multi [ Boolean ] enable multi-select mode where Ctrl-Space
+  # @param multi [ Boolean ] enable multi-select mode where Tab
   #   toggles items in a picked set and Enter returns all picked items as
   #   an Array. Defaults to false.
   # @param output [ IO ] the output stream where the interface will be rendered.
@@ -181,7 +181,7 @@ class SearchUI::Search
   # - Home (\e[H, \e[1~, \eOH) / End (\e[F, \e[4~, \eOF): Jump to first / last.
   # - PgUp (\e[5~) / PgDn (\e[6~): Jump by one viewport height.
   # - Enter (`\r`): Confirms the current selection.
-  # - Ctrl-Space (`\x00`): In multi mode, toggles selection of the current
+  # - Tab (`\t`): In multi mode, toggles selection of the current
   #   match. In single mode, ignored.
   # - Ctrl-C: Raises Interrupt, caught to cancel the search operation.
   # - Ctrl-K (`\v`): Clears the current search answer.
@@ -253,7 +253,7 @@ class SearchUI::Search
         @state.selector = 0
         @state.answer.clear
         nil
-      when "\x00"
+      when ?\t
         if @multi
           if m = @matches[@state.selector]
             case
@@ -269,7 +269,7 @@ class SearchUI::Search
           end
         end
         nil
-      when /\A[\x01-\x1f]\z/
+      when /\A[\x00-\x1f]\z/
         nil
       else
         @state.selector = 0

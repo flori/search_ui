@@ -5,14 +5,14 @@
 # Usage:
 #   search_it [ITEM …]     Search through command-line arguments
 #   search_it -f FILE      Search through lines of a file
-#   search_it -m …         Multi-select mode (Ctrl-Space to toggle, Enter to confirm)
+#   search_it -m …         Multi-select mode (Tab to toggle, Enter to confirm)
 #
 # Keys:
 #   ↑/↓      Navigate results
 #   Enter    Confirm selection
 #   Ctrl-C   Abort (returns nothing)
 #   Ctrl-K   Clear search input
-#   Ctrl-Space  Toggle item (multi mode only)
+#   Tab       Toggle item (multi mode only)
 
 require 'search_ui'
 require 'tins/terminal'

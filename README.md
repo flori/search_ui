@@ -12,7 +12,7 @@ Complete API documentation is available at: [GitHub.io](https://flori.github.io/
 
 - **Interactive Navigation** 🎮: Arrow key navigation through search results
 - **Real-time Filtering** ⚡: Instant search updates as you type
-- **Multi-Select** 📋: Ctrl-Space toggles items, Enter returns all picked
+- **Multi-Select** 📋: Tab toggles items, Enter returns all picked
 - **Flexible Configuration** 🔧: Customizable matching, display, and selection logic
 - **Terminal-aware** 🖥️: Properly handles terminal input and display management
 - **Minimal Dependencies** 📦: Lightweight implementation using standard Ruby libraries
@@ -76,7 +76,7 @@ render a visual marker (e.g. `✔`) on already-selected entries.
 | Key         | Action                                          |
 |-------------|-------------------------------------------------|
 | Arrow Up/Dn | Navigate the list                               |
-| Ctrl-Space  | Toggle selection of the current entry           |
+| Tab         | Toggle selection of the current entry           |
 | Enter       | Confirm and return all picked items as an Array |
 | Ctrl-C      | Abort and return `nil`                          |
 
@@ -99,7 +99,7 @@ result = SearchUI::Search.new(
   found: ->(answer, matches, selector) { matches[selector] },
   multi:   true,
   picked:  ['bananas'],
-  prompt:  'Pick fruit? %s [^Space=toggle, Enter=done, ^C=abort]'
+  prompt:  'Pick fruit? %s [Tab=toggle, Enter=done, ^C=abort]'
 ).start
 
 puts "Picked: #{result.inspect}"
