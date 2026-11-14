@@ -13,14 +13,14 @@ Gem::Specification.new do |s|
   s.email = "flori@ping.de".freeze
   s.executables = ["search_it".freeze]
   s.extra_rdoc_files = ["README.md".freeze, "lib/search_ui.rb".freeze, "lib/search_ui/search.rb".freeze, "lib/search_ui/version.rb".freeze, "lib/search_ui/wrapper.rb".freeze]
-  s.files = [".rspec".freeze, "Gemfile".freeze, "LICENSE".freeze, "README.md".freeze, "Rakefile".freeze, "VERSION".freeze, "bin/search_it".freeze, "lib/search_ui.rb".freeze, "lib/search_ui/search.rb".freeze, "lib/search_ui/version.rb".freeze, "lib/search_ui/wrapper.rb".freeze, "search_ui.gemspec".freeze, "spec/search_ui/wrapper_spec.rb".freeze, "spec/spec_helper.rb".freeze]
+  s.files = [".rspec".freeze, "Gemfile".freeze, "LICENSE".freeze, "README.md".freeze, "Rakefile".freeze, "VERSION".freeze, "bin/search_it".freeze, "lib/search_ui.rb".freeze, "lib/search_ui/search.rb".freeze, "lib/search_ui/version.rb".freeze, "lib/search_ui/wrapper.rb".freeze, "search_ui.gemspec".freeze, "spec/search_ui/search_spec.rb".freeze, "spec/search_ui/wrapper_spec.rb".freeze, "spec/spec_helper.rb".freeze]
   s.homepage = "https://github.com/flori/search_ui".freeze
   s.licenses = ["MIT".freeze]
   s.rdoc_options = ["--title".freeze, "SearchUI -- Search User Interface".freeze, "--main".freeze, "README.md".freeze]
   s.required_ruby_version = Gem::Requirement.new(">= 2.0".freeze)
   s.rubygems_version = "4.0.24".freeze
   s.summary = "Library to provide a user interface for searching in a console".freeze
-  s.test_files = ["spec/search_ui/wrapper_spec.rb".freeze, "spec/spec_helper.rb".freeze]
+  s.test_files = ["spec/search_ui/search_spec.rb".freeze, "spec/search_ui/wrapper_spec.rb".freeze, "spec/spec_helper.rb".freeze]
 
   s.specification_version = 4
 
