@@ -1,5 +1,6 @@
 require 'term/ansicolor'
 require 'io/console'
+require 'tins'
 
 # SearchUI::Search manages interactive console-based searching through an array
 # of objects
@@ -33,12 +34,14 @@ class SearchUI::Search
   # @param match [ Proc ] a procedure that accepts a search pattern string and returns
   #   an array of matching objects.
   # @param query [ Proc ] a procedure that accepts the current answer, the
-  #   list of matches, and the current selector index. In multi mode a fourth
-  #   argument — a Hash of picked items — is appended so callers can render
-  #   selection markers. Used to generate the string representation of the
-  #   results list.
-  # @param found [ Proc ] a procedure that accepts the current answer, the list of
-  #   matches, and the current selector index to determine the final selected object.
+  #   visible slice of matches, the cursor index relative to that slice, and
+  #   (in multi mode) a fourth argument — a Hash of picked items. Used to
+  #   generate the string representation of the visible results.
+  # @param found [ Proc ] a procedure that accepts the current answer, the
+  #   full list of matches, and the absolute selector index to determine the
+  #   final selected object.
+  # @param height [ Integer ] the number of rows to display. Defaults to
+  #   `Tins::Terminal.lines - 1` (clamped to >= 0).
   # @param multi [ Boolean ] enable multi-select mode where Ctrl-Space
   #   toggles items in a picked set and Enter returns all picked items as
   #   an Array. Defaults to false.
@@ -58,6 +61,7 @@ class SearchUI::Search
     match:,
     query:,
     found:,
+    height: (Tins::Terminal.lines - 1).clamp(0..),
     multi:  false,
     output: STDOUT,
     prompt: 'Search? %s',
@@ -67,6 +71,8 @@ class SearchUI::Search
     @match        = match
     @query        = query
     @found        = found
+    @height       = height
+    @offset       = 0
     @output       = output
     @prompt       = prompt
     @multi        = multi
@@ -100,9 +106,7 @@ class SearchUI::Search
   #   items or nil if cancelled.
   def start
     @output.print reset
-    @matches = @match.(@state.answer)
-    @state.selector = @state.selector.clamp(0, [ @matches.size - 1, 0 ].max)
-    result = execute_query(@state.answer, @matches, @state.selector, @picked)
+    result = refresh
     loop do
       @output.print clear_screen
       @output.print move_home { @prompt % @state.answer + ?\n + result }
@@ -121,33 +125,43 @@ class SearchUI::Search
       when false
         return nil
       end
-      @matches = @match.(@state.answer)
-      @state.selector = @state.selector.clamp(0, [ @matches.size - 1, 0 ].max)
-      result = execute_query(@state.answer, @matches, @state.selector, @picked)
+      result = refresh
     end
   end
 
   private
 
-  # Invokes the user-supplied `query` proc with the appropriate arity.
+  # Re-runs the match proc, keeps the selector and scroll offset in sync
+  # with the new result set, and renders the visible window.
   #
-  # In multi mode the `picked` Hash is forwarded as a fourth argument so
-  # callers can render selection markers; in single mode only three
-  # arguments are passed, preserving backward compatibility with existing
-  # three-parameter lambdas.
-  #
-  # @param answer [ String ] the current search input
-  # @param matches [ Array ] the current list of matched objects
-  # @param selector [ Integer ] the index of the active selection
-  # @param picked [ Hash ] the multi-select picked set (forwarded only in
-  #   multi mode)
-  # @return [ String ] the rendered results list
-  def execute_query(answer, matches, selector, picked)
+  # @return [ String ] the rendered results list for the current viewport
+  def refresh
+    @matches = @match.(@state.answer)
+    @state.selector = @state.selector.clamp(0, [ @matches.size - 1, 0 ].max)
+    adjust_offset
+    slice, relative = viewport
     if @multi
-      @query.(answer, matches, selector, picked)
+      @query.(@state.answer, slice, relative, @picked)
     else
-      @query.(answer, matches, selector)
+      @query.(@state.answer, slice, relative)
     end
+  end
+
+  # Slides the scroll offset so the selected item is always inside the
+  # visible window, using sticky hysteresis: the window only moves when the
+  # cursor crosses an edge, never on mere up/down wobble.
+  def adjust_offset
+    @offset = [ @offset, [ @matches.size - @height, 0 ].max ].min
+    @offset = @state.selector if @state.selector < @offset
+    @offset = @state.selector - @height + 1 if @state.selector >= @offset + @height
+  end
+
+  # Returns the slice of matches for the visible window along with the
+  # selector's position relative to that slice.
+  #
+  # @return [ Array, Integer ] the visible rows and the relative cursor index
+  def viewport
+    [ @matches[@offset, @height], @state.selector - @offset ]
   end
 
   # Reads and processes a single character input from STDIN, handling special
