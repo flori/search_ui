@@ -10,7 +10,7 @@ Complete API documentation is available at: [GitHub.io](https://flori.github.io/
 
 ## Features
 
-- **Interactive Navigation** 🎮: Arrow key navigation through search results
+- **Interactive Navigation** 🎮: Arrow keys, Home, End, PgUp, PgDn with scrollable viewport
 - **Real-time Filtering** ⚡: Instant search updates as you type
 - **Multi-Select** 📋: Tab toggles items, Enter returns all picked
 - **Flexible Configuration** 🔧: Customizable matching, display, and selection logic
@@ -76,6 +76,8 @@ render a visual marker (e.g. `✔`) on already-selected entries.
 | Key         | Action                                          |
 |-------------|-------------------------------------------------|
 | Arrow Up/Dn | Navigate the list                               |
+| Home / End  | Jump to first / last entry                      |
+| PgUp / PgDn | Scroll by one viewport height                   |
 | Tab         | Toggle selection of the current entry           |
 | Enter       | Confirm and return all picked items as an Array |
 | Ctrl-C      | Abort and return `nil`                          |
@@ -105,6 +107,24 @@ result = SearchUI::Search.new(
 puts "Picked: #{result.inspect}"
 ```
 
+**Bulk selection sentinels:**
+
+Pass `all:` and `none:` to add sentinel entries that bulk-select or
+clear all items in one Tab press. Include the sentinel strings in your
+entry list; they are excluded from the returned result:
+
+```ruby
+entries = %w[ [ALL] [NONE] ] + fruit_list
+
+result = SearchUI::Search.new(
+  # ... match:, query:, found: as above ...
+  multi:  true,
+  all:    '[ALL]',
+  none:   '[NONE]',
+  prompt: 'Pick? %s [Tab=toggle, Enter=done, ^C=abort]'
+).start
+```
+
 ### Command Line Tool
 
 The `search_it` binary provides a ready-to-use search interface:
@@ -115,6 +135,9 @@ The `search_it` binary provides a ready-to-use search interface:
 
 # Search through a file 📄
 ./bin/search_it -f items.txt
+
+# Multi-select mode (Tab to toggle, Enter to confirm) 📋
+./bin/search_it -m apple banana cherry
 ```
 
 ## Author
