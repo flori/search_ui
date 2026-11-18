@@ -1,5 +1,3 @@
-# vim: set filetype=ruby et sw=2 ts=2:
-
 require 'gem_hadar'
 
 GemHadar do
@@ -18,8 +16,8 @@ GemHadar do
   test_dir    'spec'
 
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', 'coverage', '.AppleDouble',
-    'tags', '.DS_Store', '.yardoc', 'doc'
-    package_ignore '.github', '.gitignore'
+    'tags', '.DS_Store', '.yardoc', 'doc', 'cscope.out'
+  package_ignore '.github', '.gitignore'
   readme      'README.md'
   title       "#{path_module} -- Search User Interface"
 
